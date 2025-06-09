@@ -42,7 +42,9 @@
         @if(isset($anggota) && $anggota->profil)
         <div class="pt-3">
             <h2 class="text-xl font-semibold mt-6 mb-2 text-gray-900 dark:text-white transition-colors duration-300">Profil</h2>
-            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed transition-colors duration-300">{{ $anggota->profil }}</p>
+            <div class="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 transition-colors duration-300">
+    {!! $anggota->profil !!}
+</div>
         </div>
         @endif
     </div>

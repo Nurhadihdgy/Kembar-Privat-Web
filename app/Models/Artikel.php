@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Artikel extends Model
 {
@@ -38,9 +39,10 @@ class Artikel extends Model
         return $this->belongsTo(KategoriArtikel::class, 'kategori_artikel_id');
     }
 
-    public function tags()
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'artikel_tag', 'artikel_id', 'tag_id');
+        // Pastikan nama tabel pivot 'artikel_tag' dan foreign key nya benar
     }
 
     public function penulis()
@@ -48,14 +50,14 @@ class Artikel extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
     public function komentars()
-{
-    return $this->hasMany(Komentar::class)->whereNull('parent_id')->with('replies');
-}
-// Scope untuk artikel yang sudah dipublikasikan dan tanggal publikasinya tidak di masa depan
+    {
+        return $this->hasMany(Komentar::class)->whereNull('parent_id')->with('replies');
+    }
+    // Scope untuk artikel yang sudah dipublikasikan dan tanggal publikasinya tidak di masa depan
     public function scopePublished($query)
     {
         return $query->where('is_published', true)
-                     ->whereNotNull('published_at')
-                     ->where('published_at', '<=', now());
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
     }
 }

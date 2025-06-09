@@ -319,6 +319,110 @@
         </div>
     </section>
 
+    {{-- Ulasan / Testimoni --}}
+    <section class="my-16 bg-white dark:bg-gray-800 py-16 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 text-gray-800 dark:text-yellow-400">
+                Apa Kata Mereka?
+            </h2>
+            <p class="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+                Kami bangga telah menjadi bagian dari perjalanan spiritual banyak keluarga. Berikut adalah beberapa
+                testimoni dari mereka.
+            </p>
+
+            @if (isset($ulasans) && $ulasans->count() > 0)
+                <!-- Slider main container -->
+                <div class="swiper ulasan-slider">
+                    <!-- Additional required wrapper -->
+                    <div class="swiper-wrapper">
+                        <!-- Slides -->
+                        @foreach ($ulasans as $ulasan)
+                            <div class="swiper-slide h-auto">
+                                <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-lg">
+                                    <div class="flex-grow">
+                                        <div class="flex items-center mb-4">
+                                            {{-- Foto Dihapus, diganti dengan inisial --}}
+                                            <div
+                                                class="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl font-bold mr-4 flex-shrink-0">
+                                                {{-- Ambil huruf pertama dari nama --}}
+                                                {{ strtoupper(substr($ulasan->nama_pengulas, 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-gray-900 dark:text-white">
+                                                    {{ $ulasan->nama_pengulas }}</p>
+                                                {{-- Menampilkan nama layanan yang diikuti --}}
+                                                @if ($ulasan->layanan)
+                                                    <p class="text-sm text-blue-600 dark:text-blue-400 font-semibold">
+                                                        {{ $ulasan->layanan->nama }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="flex mb-3">
+                                            @for ($i = 0; $i < $ulasan->rating; $i++)
+                                                <span class="text-yellow-400">⭐</span>
+                                            @endfor
+                                            @for ($i = 0; $i < 5 - $ulasan->rating; $i++)
+                                                <span class="text-gray-300">⭐</span>
+                                            @endfor
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 italic">"{{ $ulasan->ulasan }}"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <!-- If we need pagination -->
+                    <div class="swiper-pagination mt-8 relative"></div>
+                </div>
+            @else
+                <p class="text-center text-gray-500 dark:text-gray-400">Belum ada ulasan yang ditampilkan.</p>
+            @endif
+
+            {{-- Tombol Aksi di Bawah Slider Ulasan --}}
+            <div class="mt-12 text-center flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{{ route('ulasan.index') }}" {{-- Route baru yang akan kita buat --}}
+                    class="inline-block bg-white dark:bg-gray-800 dark:text-white text-gray-900 px-6 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 font-semibold shadow-lg">
+                    Lihat Semua Ulasan ({{ $totalUlasan }})
+                </a>
+                <a href="{{ route('ulasan.create') }}" {{-- Route baru yang akan kita buat --}}
+                    class="inline-block bg-blue-600 hover:bg-blue-700 dark:bg-yellow-500 dark:hover:bg-yellow-600 text-white dark:text-gray-900 px-6 py-2 rounded-lg transition-all duration-300 font-semibold shadow-lg">
+                    Tulis Ulasan Anda
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @push('scripts')
+        <script>
+            // Inisialisasi SwiperJS untuk slider ulasan
+            document.addEventListener('DOMContentLoaded', function() {
+                const ulasanSlider = new Swiper('.ulasan-slider', {
+                    loop: false, // Set false jika jumlah slide sedikit
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 20,
+                        },
+                        1024: {
+                            slidesPerView: 3,
+                            spaceBetween: 30,
+                        },
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                });
+            });
+        </script>
+    @endpush
+
     {{-- KONTAK KAMI --}}
     <section id="kontak"
         class="py-16 px-4 bg-gray-900 dark:bg-slate-100 text-white dark:text-gray-800 transition-colors duration-300">

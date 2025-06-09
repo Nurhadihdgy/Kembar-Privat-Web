@@ -20,3 +20,16 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+
+/* Di resources/css/app.css atau file CSS utama Anda */
+.prose a, 
+.dark .dark\:prose-invert a {
+    color: #2563eb; /* Ganti dengan warna biru yang Anda inginkan, misal text-blue-600 */
+    font-weight: bold;
+    text-decoration: underline; /* Opsional */
+}
+
+.prose a:hover,
+.dark .dark\:prose-invert a:hover {
+    color: #1d4ed8; /* Warna biru lebih gelap saat hover */
+}

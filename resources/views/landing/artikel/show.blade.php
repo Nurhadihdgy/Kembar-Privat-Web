@@ -30,7 +30,7 @@
     </div>
 
     {{-- Tags --}}
-    @if (isset($artikel) && $artikel->tags->count() > 0)
+    @if (isset($artikel->tags) && $artikel->tags instanceof \Illuminate\Database\Eloquent\Collection && $artikel->tags->count() > 0)
     <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3 transition-colors duration-300">Tags:</h4>
         <div class="flex flex-wrap gap-2">

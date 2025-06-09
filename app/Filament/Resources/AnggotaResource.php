@@ -12,17 +12,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
+// use Filament\Forms\Components\Textarea; // Diganti dengan RichEditor
+use Filament\Forms\Components\RichEditor; // <-- DITAMBAHKAN: Import untuk RichEditor
 use Filament\Forms\Components\Toggle;
-// use Filament\Tables\Columns\BooleanColumn; // Tidak digunakan di sini, bisa dihapus jika hanya untuk ini
+use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\BooleanFilter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\ToggleFilter; // Import untuk ToggleFilter
-use Filament\Tables\Filters\TernaryFilter; // Import untuk TernaryFilter
-use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Filters\ToggleFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -31,20 +31,21 @@ class AnggotaResource extends Resource
 {
     protected static ?string $model = Anggota::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users'; // Mengganti ikon agar lebih relevan
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('nama')->required()->maxLength(255)->columnSpanFull(),
                 FileUpload::make('foto')
                     ->label('Foto Profil')
                     ->image()
                     ->imageEditor()
-                    ->directory('foto-anggota')
+                    ->directory('anggota-fotos') // Folder penyimpanan di storage/app/public/
                     ->imagePreviewHeight('150')
+                    ->nullable()
                     ->columnSpanFull(),
+                TextInput::make('nama')->required()->maxLength(255)->columnSpanFull(),
                 Select::make('jenis_kelamin')
                     ->options([
                         'L' => 'Laki-laki',
@@ -52,10 +53,30 @@ class AnggotaResource extends Resource
                     ])
                     ->required(),
                 TextInput::make('telepon')
-                    ->tel() // Gunakan tipe tel untuk validasi
+                    ->tel()
                     ->required()
                     ->maxLength(20),
-                Textarea::make('profil')->rows(4)->columnSpanFull(),
+                RichEditor::make('profil') // <-- DIUBAH dari Textarea ke RichEditor
+                    ->label('Profil Anggota')
+                    ->columnSpanFull()
+                    ->fileAttachmentsDisk('public') // Tentukan disk penyimpanan
+                    ->fileAttachmentsDirectory('anggota-profil-attachments') // Folder untuk attachment
+                    ->fileAttachmentsVisibility('public') // Visibilitas file
+                    ->toolbarButtons([ // Opsional: kustomisasi tombol toolbar
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'codeBlock',
+                        'h2',
+                        'h3',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'undo',
+                    ]),
                 Select::make('tipe')
                     ->options([
                         'pengajar' => 'Pengajar',
@@ -64,25 +85,25 @@ class AnggotaResource extends Resource
                     ->required(),
                 Toggle::make('is_active')
                     ->label('Aktifkan Anggota')
-                    ->inline(false) // Agar label di atas toggle
+                    ->inline(false)
                     ->default(true),
-            ])->columns(2); // Mengatur form menjadi 2 kolom
+            ])->columns(2);
     }
 
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('nama')->sortable()->searchable(),
             ImageColumn::make('foto')
                 ->label('Foto')
                 ->circular()
-                ->size(50)
-                ->defaultImageUrl(url('/images/default-profile.png')),
+                ->size(60) 
+                ->defaultImageUrl(url('/images/placeholder-user.png')),
+            TextColumn::make('nama')->sortable()->searchable(),
             TextColumn::make('jenis_kelamin')
                 ->label('Jenis Kelamin')
                 ->badge()
                 ->color(fn($state): string => match ($state) {
-                    'L' => 'info', // Mengganti warna agar lebih kontras
+                    'L' => 'info',
                     'P' => 'pink',
                     default => 'gray',
                 })
@@ -97,7 +118,7 @@ class AnggotaResource extends Resource
                 ->label('Tipe')
                 ->badge()
                 ->color(fn($state): string => match ($state) {
-                    'pengajar' => 'primary', // Menggunakan warna primary Filament
+                    'pengajar' => 'primary',
                     'staff' => 'success',
                     default => 'gray',
                 })
@@ -109,35 +130,35 @@ class AnggotaResource extends Resource
 
             IconColumn::make('is_active')
                 ->label('Status Aktif')
-                ->boolean() // Ini benar untuk menampilkan boolean sebagai ikon di kolom
+                ->boolean()
                 ->trueIcon('heroicon-o-check-circle')
                 ->falseIcon('heroicon-o-x-circle')
                 ->trueColor('success')
                 ->falseColor('danger'),
         ])
-            ->filters([
-                SelectFilter::make('tipe')
-                    ->options([
-                        'pengajar' => 'Pengajar',
-                        'staff' => 'Staff',
-                    ])
-                    ->label('Filter berdasarkan Tipe'),
-                TernaryFilter::make('is_active')
-                    ->label('Filter Status Aktif')
-                    ->trueLabel('Aktif')
-                    ->falseLabel('Tidak Aktif')
-                    ->placeholder('Semua Status'),
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+        ->filters([
+            SelectFilter::make('tipe')
+                ->options([
+                    'pengajar' => 'Pengajar',
+                    'staff' => 'Staff',
+                ])
+                ->label('Filter berdasarkan Tipe'),
+            TernaryFilter::make('is_active')
+                ->label('Filter Status Aktif')
+                ->trueLabel('Aktif')
+                ->falseLabel('Tidak Aktif')
+                ->placeholder('Semua Status'),
+        ])
+        ->actions([
+            Tables\Actions\ViewAction::make(),
+            Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
+        ])
+        ->bulkActions([
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
+        ]);
     }
 
     public static function getRelations(): array

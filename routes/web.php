@@ -9,6 +9,12 @@ use App\Models\Layanan;
 use App\Models\Anggota;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get("/storage-link", function () {
+    Artisan::call("storage:link");
+    return 'Stored Linked Succesfully';
+});
 
 // Route::get('/sitemap.xml', function (Request $request) {
 //     $sitemap = Sitemap::create();
@@ -86,4 +92,8 @@ Route::get('/anggota', [LandingController::class, 'anggotaindex'])->name('anggot
 Route::get('/anggota/{id}', [LandingController::class, 'anggotashow'])->name('anggota.show');
 
 Route::get('/galeri', [LandingController::class, 'galeriindex'])->name('galeri.index');
+
+Route::get('/ulasan', [LandingController::class, 'ulasanIndex'])->name('ulasan.index');
+Route::get('/tulis-ulasan', [LandingController::class, 'tulisUlasan'])->name('ulasan.create');
+Route::post('/tulis-ulasan', [LandingController::class, 'storeUlasan'])->name('ulasan.store');
 

@@ -17,16 +17,22 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
 
-    <script type="application/ld+json">
+    @if(isset($totalUlasan) && $totalUlasan > 0 && isset($averageRating))
+<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
-  "name": "Kembar Privat Al-Quran",
+  "name": "Kembar Privat Al Quran",
   "url": "{{ url('/') }}",
   "logo": "{{ asset('images/logo.png') }}",
-  "description": "Layanan les privat Al-Quran dengan guru profesional, di rumah Anda.",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ number_format($averageRating, 1) }}",
+    "reviewCount": "{{ $totalUlasan }}"
+  }
 }
 </script>
+@endif
 
 
     @stack('styles')
